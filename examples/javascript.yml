@@ -1,5 +1,3 @@
-# Before use, place the reviewed action candidate (including dist/action.cjs)
-# in .github/actions/zof. After public release pin its immutable commit instead.
 name: Zof javascript changes
 on: [pull_request]
 permissions:
@@ -14,7 +12,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha }}
-      - uses: ./.github/actions/zof
+      - uses: Zof-AI/zof-github-action@v0.1.0
         id: zof
         with:
           path: .
