@@ -220896,6 +220896,7 @@ async function untracked(root) {
 
 // node_modules/@zof-ai/change-impact/dist/analyze.js
 var source = /\.(?:[cm]?[jt]sx?|py)$/i;
+var maxPythonLineCharacters = 8192;
 var isTestFile = (file) => /(?:^|\/)(?:__tests__|tests?|specs?)(?:\/|$)|(?:^|\/)(?:test_[^/]+\.py|[^/]+_test\.py)$|\.(?:test|spec)\.[cm]?[jt]sx?$/i.test(file);
 function glob(pattern) {
   if (typeof pattern !== "string" || !pattern || pattern.length > 256 || pattern.includes("..") || pattern.startsWith("/") || /[\\\x00-\x1f]/.test(pattern))
@@ -221140,6 +221141,10 @@ async function analyzeImpact(options) {
       let triple;
       for (let index = 0; index < lines.length; index++) {
         const line = lines[index];
+        if (line.length > maxPythonLineCharacters) {
+          limit("PYTHON_IMPORT_SIZE_LIMIT", "A Python lexical line exceeds 8,192 characters; file analysis requires a full-suite fallback.", file);
+          break;
+        }
         if (/'''|"""/.test(line)) {
           const quote = line.match(/'''|"""/)[0];
           const count = line.split(quote).length - 1;
