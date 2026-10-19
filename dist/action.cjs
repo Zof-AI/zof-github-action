@@ -221043,6 +221043,57 @@ async function boundedRead(root, relative, maxBytes) {
 }
 
 // node_modules/@zof-ai/change-impact/dist/diff.js
+var MAX_GIT_HEADER_BYTES = 128 * 1024;
+function quotedPathEnd(raw, start) {
+  for (let i = start + 1; i < raw.length; i++) {
+    if (raw[i] === "\\")
+      i++;
+    else if (raw[i] === '"')
+      return i + 1;
+  }
+  throw new Error("Malformed Git diff header");
+}
+function headerPaths(line) {
+  if (line.length > MAX_GIT_HEADER_BYTES || Buffer.byteLength(line) > MAX_GIT_HEADER_BYTES)
+    throw new Error("Git diff header exceeds supported input limits");
+  const raw = line.slice(11);
+  let separator = -1;
+  if (raw.startsWith('"')) {
+    separator = quotedPathEnd(raw, 0);
+  } else if (raw.startsWith("a/")) {
+    let previousQuote = -1;
+    let lastQuote = -1;
+    for (let i = 0; i < raw.length; i++) {
+      if (raw[i] === "\\")
+        i++;
+      else if (raw[i] === '"') {
+        previousQuote = lastQuote;
+        lastQuote = i;
+      }
+    }
+    const quotedStart = lastQuote === raw.length - 1 ? previousQuote : -1;
+    const hasLineTerminator = /[\r\u2028\u2029]/.test(raw);
+    for (let i = 2; i < raw.length; i++) {
+      const char = raw[i];
+      if (char === "\r" || char === "\u2028" || char === "\u2029")
+        break;
+      if (char === " " && (i + 1 === quotedStart || !hasLineTerminator && raw.startsWith("b/", i + 1))) {
+        separator = i;
+        break;
+      }
+    }
+  }
+  if (separator < 0 || raw[separator] !== " ")
+    throw new Error("Malformed Git diff header");
+  const rightStart = separator + 1;
+  if (raw[rightStart] === '"') {
+    if (quotedPathEnd(raw, rightStart) !== raw.length)
+      throw new Error("Malformed Git diff header");
+  } else if (!raw.startsWith("b/", rightStart) || /[\r\u2028\u2029]/.test(raw.slice(rightStart))) {
+    throw new Error("Malformed Git diff header");
+  }
+  return [raw.slice(0, separator), raw.slice(rightStart)];
+}
 function decodePath(raw) {
   if (raw.startsWith('"')) {
     if (!raw.endsWith('"'))
@@ -221057,8 +221108,8 @@ function decodePath(raw) {
           i++;
         continue;
       }
-      const octal = body.slice(i + 1).match(/^[0-7]{3}/)?.[0];
-      if (octal) {
+      const octal = body.slice(i + 1, i + 4);
+      if (/^[0-7]{3}$/.test(octal)) {
         bytes.push(parseInt(octal, 8));
         i += 3;
         continue;
@@ -221121,11 +221172,10 @@ function parseDiff(text) {
       finish();
       if (changes.length >= 1e4)
         throw new Error("Diff exceeds change count limit");
-      const paths = line.slice(11).match(/^("(?:[^"\\]|\\.)*"|a\/.*?) ("(?:[^"\\]|\\.)*"|b\/.*)$/);
-      if (!paths)
-        throw new Error("Malformed Git diff header");
-      const p = filePath(paths[2]);
-      if (!p)
+      const paths = headerPaths(line);
+      const previous = filePath(paths[0]);
+      const p = filePath(paths[1]);
+      if (!previous || !p)
         throw new Error("Malformed Git diff path");
       current = { path: p, status: "modified", addedLines: 0, deletedLines: 0, ranges: [] };
       continue;
@@ -221596,7 +221646,7 @@ var MAX_REPORT_BYTES = 2 * 1024 * 1024;
 var MAX_TOTAL_BYTES = 4 * 1024 * 1024;
 
 // node_modules/@zof-ai/cli/dist/index.js
-var VERSION = "0.1.0";
+var VERSION = "0.1.1";
 async function loadConfig(root) {
   const x = await safeReadJson(root, "zof.config.json");
   if (!x || typeof x !== "object" || Array.isArray(x))
@@ -221682,7 +221732,7 @@ function markdown3(report) {
   return ["# Zof local verification", `Status: **${report.evidence.execution.status}/${report.evidence.execution.result}**`, "", "| Severity | Rule | Location |", "|---|---|---|", ...report.evidence.findings.map((f) => `| ${f.severity} | ${safe(f.id)} | ${safe(f.path ?? "")}:${f.line ?? ""} |`), "", "Static heuristics only. No tests or repository scripts were executed. No hosted request was made."].join("\n");
 }
 function sarif(report) {
-  return redact({ version: "2.1.0", runs: [{ tool: { driver: { name: "zof-cli", version: "0.1.0", rules: [...new Set(report.evidence.findings.map((f) => f.id))].map((id) => ({ id, shortDescription: { text: id } })) } }, results: report.evidence.findings.map((f) => ({ ruleId: f.id, level: f.severity === "critical" || f.severity === "high" ? "error" : f.severity === "medium" ? "warning" : "note", message: { text: f.message }, ...f.path ? { locations: [{ physicalLocation: { artifactLocation: { uri: f.path.split("/").map(encodeURIComponent).join("/"), uriBaseId: "%SRCROOT%" }, region: { startLine: f.line ?? 1 } } }] } : {} })) }] });
+  return redact({ version: "2.1.0", runs: [{ tool: { driver: { name: "zof-cli", version: "0.1.1", rules: [...new Set(report.evidence.findings.map((f) => f.id))].map((id) => ({ id, shortDescription: { text: id } })) } }, results: report.evidence.findings.map((f) => ({ ruleId: f.id, level: f.severity === "critical" || f.severity === "high" ? "error" : f.severity === "medium" ? "warning" : "note", message: { text: f.message }, ...f.path ? { locations: [{ physicalLocation: { artifactLocation: { uri: f.path.split("/").map(encodeURIComponent).join("/"), uriBaseId: "%SRCROOT%" }, region: { startLine: f.line ?? 1 } } }] } : {} })) }] });
 }
 function artifacts(report) {
   return { "evidence.json": serializeEvidence(report.evidence), "report.json": JSON.stringify(redact(report), null, 2), "report.md": markdown3(report), "report.sarif": JSON.stringify(sarif(report), null, 2) };
