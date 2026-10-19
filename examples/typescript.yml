@@ -12,7 +12,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha }}
-      - uses: Zof-AI/zof-github-action@v0.1.1
+      - uses: Zof-AI/zof-github-action@v0.1.2
         id: zof
         with:
           path: .

@@ -8,7 +8,7 @@ Run offline static checks on pull-request changes, then inspect portable evidenc
 Requires Node.js 22 or 24, npm, and Git. Filesystem operations require Linux or macOS with Python 3.10 or newer; Windows file operations fail closed. Clone this repository and explicitly prepare its reviewed release dependencies:
 
 ```sh
-git clone https://github.com/Zof-AI/zof-github-action.git
+git clone --branch v0.1.2 --depth 1 https://github.com/Zof-AI/zof-github-action.git
 cd zof-github-action
 node scripts/bootstrap.mjs --allow-network
 npm ci --ignore-scripts --prefer-offline
@@ -18,7 +18,6 @@ npm test
 
 The bootstrap downloads only the exact versioned dependency assets from [GitHub Releases](https://github.com/Zof-AI/zof-github-action/releases), as listed in `scripts/release-dependencies.json`, verifies SHA256 and byte size, and adds them to the npm cache. It does not extract archives, run package scripts, collect application data, or send credentials. Downloads require the explicit flag and follow only HTTPS GitHub asset redirects. Installation then fetches ordinary third-party dependencies from npm. Use a writable npm cache; set `npm_config_cache` consistently for both commands if needed. An unavailable asset, changed hash, or oversized response stops installation.
 
-GitHub source and release artifacts are the initial distribution channel. These instructions do not claim that `@zof-ai` packages are published on npm or that the VS Code extension is listed in Marketplace.
 <!-- ZOF_RELEASE_INSTALL_END -->
 
 ## Build and local validation
@@ -27,7 +26,7 @@ Use Node 22 or 24. Use the GitHub source installation above, then `npm run build
 
 ## Workflow examples
 
-Three complete examples in `examples/` cover JavaScript, TypeScript and Python pull requests. They reference `Zof-AI/zof-github-action@v0.1.1`. The version tag is protected against changes; an exact reviewed release commit SHA may also be used. They do not run PR package scripts, use `pull_request_target`, receive production secrets or grant write permissions. Use `actions/upload-artifact` with `if: always()` and the action output to retain reports even when verification fails.
+Three complete examples in `examples/` cover JavaScript, TypeScript and Python pull requests. They reference `Zof-AI/zof-github-action@v0.1.2`. The version tag is protected against changes; an exact reviewed release commit SHA may also be used. They do not run PR package scripts, use `pull_request_target`, receive production secrets or grant write permissions. Use `actions/upload-artifact` with `if: always()` and the action output to retain reports even when verification fails.
 
 Inputs: `path` (checkout), `base` (baseline revision), `head` (optional exact candidate revision), `fail_on` (default high; info/low/medium/high/critical). The checkout must equal an explicit head and be clean. Outputs: `result` and `evidence-directory`. The evidence directory is created exclusively under runner temporary storage. A safe job summary is appended automatically. Exit 0 means completed check, 1 means configured finding and 2 means invalid/incomplete input. Optional hosted credentials are neither required nor read.
 
