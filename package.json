@@ -1,5 +1,5 @@
 {
-  "name": "@zofai/github-action",
+  "name": "@zof-ai/github-action",
   "version": "0.1.0",
   "description": "GitHub Actions integration for local Zof change verification",
   "type": "module",
@@ -56,8 +56,8 @@
     "esbuild": "0.28.2"
   },
   "dependencies": {
-    "@zofai/cli": "0.1.0",
-    "@zofai/evidence-spec": "0.1.0"
+    "@zof-ai/cli": "0.1.0",
+    "@zof-ai/evidence-spec": "0.1.0"
   },
   "private": true
 }

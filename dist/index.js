@@ -1,5 +1,5 @@
-import { verify } from '@zofai/cli';
-import { redact, serializeEvidence } from '@zofai/evidence-spec';
+import { verify } from '@zof-ai/cli';
+import { redact, serializeEvidence } from '@zof-ai/evidence-spec';
 export { verify };
 export function markdown(report) {
     report = redact(report);

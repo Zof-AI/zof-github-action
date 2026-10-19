@@ -1,7 +1,7 @@
 import { tmpdir } from 'node:os';
 import { join, resolve, dirname, basename } from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { safeWriteFiles, safeAppendFile } from '@zofai/evidence-spec';
+import { safeWriteFiles, safeAppendFile } from '@zof-ai/evidence-spec';
 import { verify, artifacts, markdown } from './index.js';
 async function appendRunnerFile(path, text) {
     if (path)
