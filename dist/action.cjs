@@ -221274,11 +221274,17 @@ var MAX_INPUT_BYTES3 = 4 * 1024 * 1024;
 // node_modules/@zof-ai/code-risk-score/dist/index.js
 var DEFAULT_WEIGHTS = Object.freeze({ changedFiles: 2, changedLines: 0.05, authentication: 15, payments: 15, migrations: 12, publicApi: 10, concurrency: 10, coverageGap: 15, dependencies: 12, configuration: 5 });
 
-// node_modules/@zof-ai/testgen/dist/index.js
+// node_modules/@zof-ai/testgen/dist/core.js
 var import_typescript2 = __toESM(require_typescript(), 1);
 
 // node_modules/@zof-ai/testgen/dist/common.js
 var MAX_INPUT_BYTES4 = 4 * 1024 * 1024;
+
+// node_modules/@zof-ai/testgen/dist/ollama.js
+var MAX_SOURCE_BYTES = 16 * 1024;
+var MAX_REQUEST_BYTES = 32 * 1024;
+var MAX_RESPONSE_BYTES = 256 * 1024;
+var MAX_CANDIDATE_BYTES = 128 * 1024;
 
 // node_modules/@zof-ai/ci-evidence/dist/parsers.js
 var import_saxes = __toESM(require_saxes(), 1);
