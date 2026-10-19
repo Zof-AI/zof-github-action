@@ -1,5 +1,5 @@
-import {verify,type Verification} from '@zof-ai/cli';
-import {redact,serializeEvidence} from '@zof-ai/evidence-spec';
+import {verify,type Verification} from '@zofai/cli';
+import {redact,serializeEvidence} from '@zofai/evidence-spec';
 export {verify};
 export function markdown(report:Verification):string {
  report=redact(report);

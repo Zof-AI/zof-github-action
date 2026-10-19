@@ -1,4 +1,4 @@
-import { verify, type Verification } from '@zof-ai/cli';
+import { verify, type Verification } from '@zofai/cli';
 export { verify };
 export declare function markdown(report: Verification): string;
 export declare function sarif(report: Verification): unknown;

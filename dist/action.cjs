@@ -220107,11 +220107,11 @@ var import_node_os2 = require("node:os");
 var import_node_path5 = require("node:path");
 var import_node_crypto2 = require("node:crypto");
 
-// node_modules/@zof-ai/evidence-spec/dist/index.js
+// node_modules/@zofai/evidence-spec/dist/index.js
 var import_node_crypto = require("node:crypto");
 var import__ = __toESM(require__(), 1);
 
-// node_modules/@zof-ai/evidence-spec/dist/schema.js
+// node_modules/@zofai/evidence-spec/dist/schema.js
 var evidenceSchema = {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://example.invalid/zof/evidence/1.0.0/schema.json",
@@ -220525,7 +220525,7 @@ var evidenceSchema = {
   }
 };
 
-// node_modules/@zof-ai/evidence-spec/dist/filesystem.js
+// node_modules/@zofai/evidence-spec/dist/filesystem.js
 var import_node_child_process = require("node:child_process");
 var import_node_path = __toESM(require("node:path"), 1);
 var import_promises = require("node:fs/promises");
@@ -220880,7 +220880,7 @@ async function safeGit(root, args, maxBytes = 16 * 1024 * 1024) {
   return Buffer.from(await run(root, { op: "git", args, limit: maxBytes }), "base64").toString("utf8");
 }
 
-// node_modules/@zof-ai/evidence-spec/dist/safety.js
+// node_modules/@zofai/evidence-spec/dist/safety.js
 var import_node_path2 = __toESM(require("node:path"), 1);
 var MAX_INPUT_BYTES = 4 * 1024 * 1024;
 var SafeInputError = class extends Error {
@@ -220962,7 +220962,7 @@ async function safeReadJson(root, relativePath2, maxBytes = MAX_INPUT_BYTES) {
   return parseJson((await safeReadFile(root, relativePath2, maxBytes)).toString("utf8"), maxBytes);
 }
 
-// node_modules/@zof-ai/evidence-spec/dist/redact.js
+// node_modules/@zofai/evidence-spec/dist/redact.js
 function redactText(text) {
   if (typeof text !== "string" || Buffer.byteLength(text) > MAX_INPUT_BYTES)
     throw new SafeInputError("SIZE", "Input exceeds maximum size.");
@@ -220989,7 +220989,7 @@ function redact(value) {
   return walk(value);
 }
 
-// node_modules/@zof-ai/evidence-spec/dist/index.js
+// node_modules/@zofai/evidence-spec/dist/index.js
 var ajv = new import__.Ajv2020({ strict: true, allErrors: false, ownProperties: true, validateFormats: false });
 var validate = ajv.compile(evidenceSchema);
 var invalid = (code, message) => ({ valid: false, errors: [{ code, message }] });
@@ -221024,11 +221024,11 @@ function serializeEvidence(evidence) {
   return JSON.stringify(safe, null, 2) + "\n";
 }
 
-// node_modules/@zof-ai/change-impact/dist/analyze.js
+// node_modules/@zofai/change-impact/dist/analyze.js
 var import_typescript = __toESM(require_typescript(), 1);
 var import_node_path4 = __toESM(require("node:path"), 1);
 
-// node_modules/@zof-ai/change-impact/dist/security.js
+// node_modules/@zofai/change-impact/dist/security.js
 var import_node_path3 = __toESM(require("node:path"), 1);
 function safePath(value) {
   if (typeof value !== "string" || !value || value.length > 4096 || /[\x00-\x1f\x7f\\]/.test(value) || import_node_path3.default.posix.isAbsolute(value) || /^[A-Za-z]:/.test(value) || value.split("/").some((p) => p === ".." || p === "." || !p))
@@ -221042,7 +221042,7 @@ async function boundedRead(root, relative, maxBytes) {
   return buffer.toString("utf8");
 }
 
-// node_modules/@zof-ai/change-impact/dist/diff.js
+// node_modules/@zofai/change-impact/dist/diff.js
 function decodePath(raw) {
   if (raw.startsWith('"')) {
     if (!raw.endsWith('"'))
@@ -221172,7 +221172,7 @@ function parseDiff(text) {
   return changes.sort((a, b) => a.path.localeCompare(b.path, "en"));
 }
 
-// node_modules/@zof-ai/change-impact/dist/git.js
+// node_modules/@zofai/change-impact/dist/git.js
 async function git(root, args, maxBuffer = 16 * 1024 * 1024) {
   try {
     return await safeGit(root, args, maxBuffer);
@@ -221192,7 +221192,7 @@ async function untracked(root) {
   return (await git(root, ["ls-files", "--others", "--exclude-standard", "-z"], 2 * 1024 * 1024)).split("\0").filter(Boolean).map(safePath);
 }
 
-// node_modules/@zof-ai/change-impact/dist/analyze.js
+// node_modules/@zofai/change-impact/dist/analyze.js
 var source = /\.(?:[cm]?[jt]sx?|py)$/i;
 var maxPythonLineCharacters = 8192;
 var isTestFile = (file) => /(?:^|\/)(?:__tests__|tests?|specs?)(?:\/|$)|(?:^|\/)(?:test_[^/]+\.py|[^/]+_test\.py)$|\.(?:test|spec)\.[cm]?[jt]sx?$/i.test(file);
@@ -221567,35 +221567,35 @@ async function analyzeImpact(options) {
   return report;
 }
 
-// node_modules/@zof-ai/api-contract-check/dist/common.js
+// node_modules/@zofai/api-contract-check/dist/common.js
 var MAX_INPUT_BYTES2 = 4 * 1024 * 1024;
 
-// node_modules/@zof-ai/schema-diff/dist/common.js
+// node_modules/@zofai/schema-diff/dist/common.js
 var MAX_INPUT_BYTES3 = 4 * 1024 * 1024;
 
-// node_modules/@zof-ai/code-risk-score/dist/index.js
+// node_modules/@zofai/code-risk-score/dist/index.js
 var DEFAULT_WEIGHTS = Object.freeze({ changedFiles: 2, changedLines: 0.05, authentication: 15, payments: 15, migrations: 12, publicApi: 10, concurrency: 10, coverageGap: 15, dependencies: 12, configuration: 5 });
 
-// node_modules/@zof-ai/testgen/dist/core.js
+// node_modules/@zofai/testgen/dist/core.js
 var import_typescript2 = __toESM(require_typescript(), 1);
 
-// node_modules/@zof-ai/testgen/dist/common.js
+// node_modules/@zofai/testgen/dist/common.js
 var MAX_INPUT_BYTES4 = 4 * 1024 * 1024;
 
-// node_modules/@zof-ai/testgen/dist/ollama.js
+// node_modules/@zofai/testgen/dist/ollama.js
 var MAX_SOURCE_BYTES = 16 * 1024;
 var MAX_REQUEST_BYTES = 32 * 1024;
 var MAX_RESPONSE_BYTES = 256 * 1024;
 var MAX_CANDIDATE_BYTES = 128 * 1024;
 
-// node_modules/@zof-ai/ci-evidence/dist/parsers.js
+// node_modules/@zofai/ci-evidence/dist/parsers.js
 var import_saxes = __toESM(require_saxes(), 1);
 
-// node_modules/@zof-ai/ci-evidence/dist/index.js
+// node_modules/@zofai/ci-evidence/dist/index.js
 var MAX_REPORT_BYTES = 2 * 1024 * 1024;
 var MAX_TOTAL_BYTES = 4 * 1024 * 1024;
 
-// node_modules/@zof-ai/cli/dist/index.js
+// node_modules/@zofai/cli/dist/index.js
 var VERSION = "0.1.0";
 async function loadConfig(root) {
   const x = await safeReadJson(root, "zof.config.json");
