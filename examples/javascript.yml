@@ -1,0 +1,29 @@
+# Before use, place the reviewed action candidate (including dist/action.cjs)
+# in .github/actions/zof. After public release pin its immutable commit instead.
+name: Zof javascript changes
+on: [pull_request]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: ./.github/actions/zof
+        id: zof
+        with:
+          path: .
+          base: ${{ github.event.pull_request.base.sha }}
+          head: ${{ github.event.pull_request.head.sha }}
+          fail_on: high
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always() && steps.zof.outputs.evidence-directory != ''
+        with:
+          name: zof-javascript-evidence
+          path: ${{ steps.zof.outputs.evidence-directory }}
+          retention-days: 7

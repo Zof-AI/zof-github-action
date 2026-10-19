@@ -1,0 +1,13 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {mkdtemp,writeFile,readFile,rm} from 'node:fs/promises';import {join,resolve} from 'node:path';import {tmpdir} from 'node:os';import {spawnSync} from 'node:child_process';
+const action=resolve('dist/action.cjs');
+async function run(source,extra={}){const root=await mkdtemp(join(tmpdir(),'zof-action-'));try{
+ const git=(...args)=>{const r=spawnSync('git',['-C',root,...args],{encoding:'utf8'});assert.equal(r.status,0,r.stderr);};
+ git('init','-b','main');git('config','user.name','Synthetic');git('config','user.email','synthetic@example.invalid');await writeFile(join(root,'main.ts'),'export const n=1;\n');git('add','.');git('commit','-m','baseline');await writeFile(join(root,'main.ts'),source);
+ const output=join(root,'.git','output'),summary=join(root,'.git','summary');await writeFile(output,'');await writeFile(summary,'');
+ const r=spawnSync(process.execPath,[action],{cwd:root,encoding:'utf8',timeout:10000,env:{PATH:process.env.PATH,INPUT_PATH:root,RUNNER_TEMP:join(root,'.git'),GITHUB_OUTPUT:output,GITHUB_STEP_SUMMARY:summary,SYNTHETIC_TOKEN:'test-never-copy',...extra}});
+ const outputs=await readFile(output,'utf8');let files={};const dir=outputs.match(/^evidence-directory=(.+)$/m)?.[1];if(dir)for(const name of ['evidence.json','report.json','report.md','report.sarif'])files[name]=await readFile(join(dir,name),'utf8');
+ return {r,outputs,files,summary:await readFile(summary,'utf8')};
+}finally{await rm(root,{recursive:true,force:true});}}
+test('bundled runtime accepts clean change, emits all reports and summary',async()=>{const {r,files,summary}=await run('export const n=2;\n');assert.equal(r.status,0,r.stderr);assert.equal(JSON.parse(files['evidence.json']).execution.result,'pass');assert.equal(JSON.parse(files['report.sarif']).version,'2.1.0');assert.match(summary,/completed\/pass/);assert.ok(!JSON.stringify(files).includes('test-never-copy'));});
+test('unsafe synthetic change fails at configured threshold',async()=>{const {r,files}=await run('export const n=eval("2");\n');assert.equal(r.status,1);assert.equal(JSON.parse(files['evidence.json']).findings[0].id,'dynamic-evaluation');const relaxed=await run('export const n=eval("2");\n',{INPUT_FAIL_ON:'critical'});assert.equal(relaxed.r.status,0);});
+test('invalid configuration is safe and missing optional credentials work',async()=>{const bad=await run('export const n=2;\n',{INPUT_FAIL_ON:'synthetic-private-token'});assert.equal(bad.r.status,2);assert.ok(!bad.r.stderr.includes('synthetic-private-token'));const good=await run('export const n=2;\n');assert.equal(good.r.status,0);});

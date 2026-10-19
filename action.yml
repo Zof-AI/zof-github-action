@@ -1,0 +1,27 @@
+name: Zof local change verification
+description: Inspect changed source with offline static checks and emit portable evidence, JSON, Markdown and SARIF.
+author: Zof AI
+branding:
+  icon: shield
+  color: blue
+inputs:
+  path:
+    description: Checked-out repository path
+    default: .
+  base:
+    description: Baseline Git revision; defaults to HEAD against the working tree
+    required: false
+  head:
+    description: Optional candidate revision; requires base and a matching clean checkout
+    required: false
+  fail_on:
+    description: Minimum failing severity (info, low, medium, high or critical)
+    default: high
+outputs:
+  evidence-directory:
+    description: Isolated runner temporary directory containing evidence and reports
+  result:
+    description: pass, fail or unknown; inspect execution status for completeness
+runs:
+  using: node24
+  main: dist/action.cjs
